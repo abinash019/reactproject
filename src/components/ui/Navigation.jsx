@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,8 +12,11 @@ import {
   NavigationMenuTrigger,
 } from "@radix-ui/react-navigation-menu";
 import { CircleCheck, CircleHelp, Home, BookOpen } from "lucide-react";
+import LogoutButton from "./LogoutButton";
 
 export default function NavigationPage() {
+  const { user, isAuthenticated } = useAuth0();
+
   return (
     <NavigationMenu className="relative bg-gray-900 text-white shadow-md">
       <NavigationMenuList className="flex items-center justify-between p-4 max-w-6xl mx-auto">
@@ -37,6 +41,9 @@ export default function NavigationPage() {
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link to="/about" className="hover:text-gray-200 transition">About Us</Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <LogoutButton />
                 </NavigationMenuLink>
               </ul>
             </NavigationMenuContent>
@@ -70,6 +77,29 @@ export default function NavigationPage() {
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
+
+          {/* User Profile */}
+          {isAuthenticated && (
+            <div className="flex items-center gap-3 ml-6">
+              <img
+                src={user.picture}
+                alt={user.name}
+                className="w-8 h-8 rounded-full"
+              />
+              <div className="flex flex-col text-sm">
+                <span>{user.name}</span>
+                <span className="text-gray-400 text-xs">{user.email}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Logout */}
+          <NavigationMenuItem>
+            <NavigationMenuLink asChild>
+              <LogoutButton />
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+
         </div>
       </NavigationMenuList>
     </NavigationMenu>
