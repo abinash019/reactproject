@@ -4,6 +4,22 @@ import LogoutButton from '../components/ui/LogoutButton';
 
 const Profile = () => {
   const { user, isAuthenticated, isLoading } = useAuth0();
+  const [roles, setRoles] = useState([]);
+
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const claims = await getIdTokenClaims();
+      const userRoles = claims["https://your-app.com/roles"] || [];
+      setRoles(userRoles);
+    };
+    fetchRoles();
+  }, [getIdTokenClaims]);
+
+  if (!isAuthenticated) {
+    return <div>Please login first</div>;
+  }
+
 
   if (isLoading) return <div>Loading...</div>;
 
