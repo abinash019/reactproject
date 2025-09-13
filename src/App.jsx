@@ -5,6 +5,9 @@ import Login from './pages/auth/Login';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import NavigationPage from './components/ui/Navigation';
+import ProtectedRoute from './routes/ProtectedRoute';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminRoute from './routes/AdminRoute';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -42,6 +45,15 @@ function App() {
         */}
         {/* Default route */}
         <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
+
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </>
   );
