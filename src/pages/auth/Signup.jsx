@@ -11,6 +11,10 @@ const Signup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  const handleRedirect = () => {
+    navigate('/login'); // This redirects to the signup page
+  };
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -123,6 +127,14 @@ const Signup = () => {
 
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Signing up..." : "Sign Up"}
+        </Button>
+
+        <Button
+          variant="link"  // Makes it text style (no button appearance)
+          className=" mx-5 bg-white  hover:bg-gray-100 hover:underline hover:decoration-blue-500 py-2 px-4"
+          onClick={handleRedirect}
+        >
+          <span className='text-blue-500'> Go to Login</span>
         </Button>
       </form>
     </div>
