@@ -139,14 +139,18 @@ const Login = ({ onLogin }) => {
 
     if (storedUser.email === email && storedUser.password === password) {
       setLoading(true);
+      toast.success("Login successful! Redirecting...");
+
 
       setTimeout(() => {
         setLoading(false);
-        toast.success("Login successful! Redirecting...");
-        navigate("/localprofile");
-      }, 1000);
+        setError("");
+        if (onLogin) onLogin();
 
-      setError("");
+        navigate("/localprofile");
+
+      }, 1500);
+
     } else {
       setError("Email or Password is incorrect!");
     }
@@ -161,6 +165,8 @@ const Login = ({ onLogin }) => {
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">
+      <Toaster position="top-center" reverseOrder={false} />
+
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleLogin}>

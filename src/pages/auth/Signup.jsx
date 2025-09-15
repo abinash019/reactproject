@@ -36,19 +36,23 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
+    toast.success("Signup successful! Redirecting to login...");
+
 
     setTimeout(() => {
-      const storedUser = JSON.parse(localStorage.getItem("user"));
+      localStorage.setItem("user", JSON.stringify(formData));
       setLoading(false);
-      toast.success("Signup successful! Redirecting to login...");
-    }, 2000);
+      navigate("/login");
 
-    navigate("/login");
+    }, 1500);
+
 
   };
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">
+      <Toaster position="top-center" reverseOrder={false} />
+
       <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
       <form onSubmit={handleSubmit} className=" space-y-4">
 
