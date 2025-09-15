@@ -41,7 +41,8 @@ const Signup = () => {
       const storedUser = JSON.parse(localStorage.getItem("user"));
       setLoading(false);
       toast.success("Signup successful! Redirecting to login...");
-    }, 1000);
+    }, 2000);
+
     navigate("/login");
 
   };
