@@ -8,9 +8,15 @@ import NavigationPage from './components/ui/Navigation';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminRoute from './routes/AdminRoute';
+import Signup from './pages/auth/Signup';
+import LocalProfile from './pages/LocalProfile';
+import { useState } from 'react';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("user")
+  );
 
   if (isLoading) return <div>Loading...</div>; // Auth0 initialization wait
 
@@ -21,6 +27,8 @@ function App() {
       <Routes>
         {/* Public login page */}
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+        <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />} />
+
 
         {/* Protected routes */}
         {/* Protected routes */}
@@ -38,6 +46,17 @@ function App() {
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/localprofile"
+          element={
+            isLoggedIn ? (
+              <LocalProfile onLogout={() => setIsLoggedIn(false)} />
+            ) : (
+              <Login onLogin={() => setIsLoggedIn(true)} />
+            )
           }
         />
         {/*

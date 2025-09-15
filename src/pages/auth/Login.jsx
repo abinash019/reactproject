@@ -106,17 +106,110 @@ const Login = () => {
 export default Login
 */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { Label } from '../../components/ui/label';
+import { Input } from '../../components/ui/input';
+import { FaFacebook, FaUserPlus } from 'react-icons/fa';
+import { SiAuth0 } from 'react-icons/si';
+import toast, { Toaster } from "react-hot-toast";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const { loginWithRedirect } = useAuth0();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    // Fetch stored user data
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    if (!storedUser) {
+      setError("No user found. Please sign up first.");
+      return;
+    }
+
+    if (storedUser.email === email && storedUser.password === password) {
+      setLoading(true);
+
+      setTimeout(() => {
+        setLoading(false);
+        toast.success("Login successful! Redirecting...");
+        navigate("/localprofile");
+      }, 1000);
+
+      setError("");
+    } else {
+      setError("Email or Password is incorrect!");
+    }
+  };
+
+
+
+
+  const handleRedirect = () => {
+    navigate('/signup'); // This redirects to the signup page
+  };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <Button onClick={() => loginWithRedirect()}>Login with Auth0</Button>
-    </div>
+    <div className="max-w-md mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">
+      <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleLogin}>
+        <Label>Email
+
+        </Label>
+        <Input
+          type='text'
+          id='email'
+          name='email'
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+
+
+
+        />
+
+        <Label>Passsword</Label>
+        <Input
+          type='password'
+          id='password'
+          name='password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+
+        />
+        <Button type="submit" className="min-w-[180px] mt-4">{loading ? "login..." : "Login"}</Button>
+
+      </form>
+      <Button
+        variant="link"  // Makes it text style (no button appearance)
+        className="mt-4 mx-5 bg-white  hover:bg-gray-100 hover:underline hover:decoration-blue-500 py-2 px-4"
+        onClick={handleRedirect}
+      >
+        <span className='text-blue-500'> Go to Signup</span>
+      </Button>
+
+      <Button
+        className="w-full flex items-center justify-center gap-2 border bg-white text-orange-500 shadow hover:bg-gray-100 mt-4"
+        onClick={() => loginWithRedirect()}
+      >
+        <SiAuth0 className="text-orange-500" size={20} />
+        <span className="text-orange-500">Continue with Auth0</span>
+      </Button>
+
+
+
+
+
+    </div >
   );
 };
 
