@@ -149,7 +149,7 @@ const Login = ({ onLogin }) => {
 
         navigate("/localprofile");
 
-      }, 1500);
+      }, 1000);
 
     } else {
       setError("Email or Password is incorrect!");

@@ -44,7 +44,7 @@ const Signup = () => {
       setLoading(false);
       navigate("/login");
 
-    }, 1500);
+    }, 1000);
 
 
   };
