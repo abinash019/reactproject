@@ -11,6 +11,10 @@ import AdminRoute from './routes/AdminRoute';
 import Signup from './pages/auth/Signup';
 import LocalProfile from './pages/LocalProfile';
 import { useState } from 'react';
+import { useSelector, useDispatch, Provider } from "react-redux";
+import { decrement, increment } from './redux/counterSlice';
+import { store } from './redux/store';
+import { Button } from './components/ui/button';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -18,64 +22,83 @@ function App() {
     !!localStorage.getItem("user")
   );
 
+  function Counter() {
+    const count = useSelector(state => state.counter.count); // store बाट state पढ्छ
+    const dispatch = useDispatch(); // action पठाउँछ
+
+    return (
+      <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <h1>Counter: {count}</h1>
+        <Button onClick={() => dispatch(decrement())} style={{ marginRight: "10px" }}>-</Button>
+        <Button onClick={() => dispatch(increment())}>+</Button>
+      </div>
+    );
+  }
+
   if (isLoading) return <div>Loading...</div>; // Auth0 initialization wait
 
   return (
     <>
-      <NavigationPage />
+      <Provider store={store}>
+        <NavigationPage />
 
-      <Routes>
-        <Route path="/" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
-
-        {/* Public login page */}
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
-        <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />} />
+        <Counter />
 
 
-        {/* Protected routes */}
-        {/* Protected routes */}
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
 
-        <Route
-          path="/localprofile"
-          element={
-            isLoggedIn ? (
-              <LocalProfile onLogout={() => setIsLoggedIn(false)} />
-            ) : (
-              <Login onLogin={() => setIsLoggedIn(true)} />
-            )
-          }
-        />
-        {/*
+        <Routes>
+          <Route path="/" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+
+          {/* Public login page */}
+          <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+          <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />} />
+
+
+          {/* Protected routes */}
+          {/* Protected routes */}
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/localprofile"
+            element={
+              isLoggedIn ? (
+                <LocalProfile onLogout={() => setIsLoggedIn(false)} />
+              ) : (
+                <Login onLogin={() => setIsLoggedIn(true)} />
+              )
+            }
+          />
+          {/*
           <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
         */}
-        {/* Default route */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
+          {/* Default route */}
+          <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
 
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          }
-        />
-      </Routes>
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
+        </Routes>
+      </Provider>
     </>
   );
 }
