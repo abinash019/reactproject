@@ -12,7 +12,7 @@ import Signup from './pages/auth/Signup';
 import LocalProfile from './pages/LocalProfile';
 import { useState } from 'react';
 import { useSelector, useDispatch, Provider } from "react-redux";
-import { decrement, increment } from './redux/counterSlice';
+import { decrement, increment, reset, setStep } from './redux/counterSlice';
 import { store } from './redux/store';
 import { Button } from './components/ui/button';
 
@@ -23,14 +23,24 @@ function App() {
   );
 
   function Counter() {
-    const count = useSelector(state => state.counter.count); // store बाट state पढ्छ
+    const { count, step } = useSelector(state => state.counter);
     const dispatch = useDispatch(); // action पठाउँछ
 
     return (
       <div style={{ textAlign: "center", marginTop: "50px" }}>
         <h1>Counter: {count}</h1>
+        <h3>Step: {step}</h3>
+        <input
+          type="number"
+          value={step}
+          onChange={(e) => dispatch(setStep(Number(e.target.value)))}
+        />
+
+
         <Button onClick={() => dispatch(decrement())} style={{ marginRight: "10px" }}>-</Button>
         <Button onClick={() => dispatch(increment())}>+</Button>
+        <Button className='mx-4' onClick={() => dispatch(reset())}>Reset</Button>
+
       </div>
     );
   }
