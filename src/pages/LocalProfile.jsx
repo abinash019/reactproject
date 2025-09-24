@@ -1,11 +1,20 @@
 import React, { useState } from "react";
 import { Button } from "../components/ui/button";
 import toast, { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, updateUser } from "../redux/authSlice";
 
 
 const LocalProfile = ({ onLogout }) => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const [user, setUser] = useState(storedUser);
+  const storedUser = useSelector((state) => state.auth.user);
+
+  // JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(storedUser || { firstName: '', lastName: '', email: '', phone: '', bio: '' });
+
+  const [originalUser, setOriginalUser] = useState(storedUser);
+
+  const dispatch = useDispatch();
+
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +36,8 @@ const LocalProfile = ({ onLogout }) => {
 
   const handleSave = () => {
     setLoading(true)
-    localStorage.setItem("user", JSON.stringify(user));
+    dispatch(updateUser(user))
+    //localStorage.setItem("user", JSON.stringify(user));
 
     setTimeout(() => {
       setLoading(false)
@@ -37,6 +47,8 @@ const LocalProfile = ({ onLogout }) => {
 
 
   };
+  const handleCancel = () => { setUser(originalUser); setIsEditing(false); };
+
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">
@@ -99,7 +111,7 @@ const LocalProfile = ({ onLogout }) => {
 
           <div className="mt-6 flex justify-between">
             <Button className="bg-green-600 hover:bg-green-800" onClick={handleSave}>{loading ? 'Saving....' : 'Save'}</Button>
-            <Button variant="outline" onClick={() => setIsEditing(false)}>
+            <Button variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
           </div>
@@ -116,7 +128,7 @@ const LocalProfile = ({ onLogout }) => {
           <p><strong>Bio:</strong> {user.bio}</p>
 
           <div className="mt-6 flex justify-between">
-            <Button className="bg-red-500 hover:bg-red-800" onClick={() => { localStorage.removeItem("user"); onLogout(); }}>
+            <Button className="bg-red-500 hover:bg-red-800" onClick={onLogout}>
               Logout
             </Button>
             <Button onClick={() => { setIsEditing(true) }}>

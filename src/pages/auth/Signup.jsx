@@ -4,12 +4,16 @@ import { Label } from "../../components/ui/label";
 import { Button } from "../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { login, signup } from "../../redux/authSlice";
 
 
 
 const Signup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+
 
   const handleRedirect = () => {
     navigate('/login'); // This redirects to the signup page
@@ -40,7 +44,8 @@ const Signup = () => {
 
 
     setTimeout(() => {
-      localStorage.setItem("user", JSON.stringify(formData));
+      dispatch(signup(formData))
+      //localStorage.setItem("user", JSON.stringify(formData));
       setLoading(false);
       navigate("/login");
 

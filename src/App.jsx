@@ -15,17 +15,20 @@ import { useSelector, useDispatch, Provider } from "react-redux";
 import { decrement, increment, reset, setStep } from './redux/counterSlice';
 import { store } from './redux/store';
 import { Button } from './components/ui/button';
+import RouteProtected from './routes/RouteProtected';
+import { logout } from './redux/authSlice';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
+  const dispatch = useDispatch();
+
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("user")
   );
 
-  function Counter() {
+  /*function Counter() {
     const { count, step } = useSelector(state => state.counter);
-    const dispatch = useDispatch(); // action पठाउँछ
-
+    const dispatch = useDispatch();
     return (
       <div style={{ textAlign: "center", marginTop: "50px" }}>
         <h1>Counter: {count}</h1>
@@ -43,47 +46,56 @@ function App() {
 
       </div>
     );
-  }
+  }*/
 
   if (isLoading) return <div>Loading...</div>; // Auth0 initialization wait
 
   return (
     <>
-      <Provider store={store}>
-        <NavigationPage />
 
-        <Counter />
+      <NavigationPage />
 
 
 
-        <Routes>
-          <Route path="/" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
-
-          {/* Public login page */}
-          <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
-          <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />} />
 
 
-          {/* Protected routes */}
-          {/* Protected routes */}
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+      <Routes>
+        <Route path="/" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
 
-          <Route
+        {/* Public login page */}
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+        <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />} />
+
+
+        {/* Protected routes */}
+        {/* Protected routes */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/localprofile"
+          element={
+            <RouteProtected>
+              <LocalProfile onLogout={() => dispatch(logout())} />
+            </RouteProtected>
+          }
+        />
+
+
+        {/* <Route
             path="/localprofile"
             element={
               isLoggedIn ? (
@@ -92,23 +104,25 @@ function App() {
                 <Login onLogin={() => setIsLoggedIn(true)} />
               )
             }
-          />
-          {/*
+          /> */}
+
+
+
+        {/*
           <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
         */}
-          {/* Default route */}
-          <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
+        {/* Default route */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
 
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }
-          />
-        </Routes>
-      </Provider>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+      </Routes>
     </>
   );
 }

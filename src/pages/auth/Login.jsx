@@ -115,21 +115,33 @@ import { Input } from '../../components/ui/input';
 import { FaFacebook, FaUserPlus } from 'react-icons/fa';
 import { SiAuth0 } from 'react-icons/si';
 import toast, { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../redux/authSlice';
 
 const Login = ({ onLogin }) => {
   const { loginWithRedirect } = useAuth0();
+  const dispatch = useDispatch();
+  //const loading = useSelector((state) => state.auth.loading);
+
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const storedUser = useSelector(state => state.auth.user);
+
 
 
   const handleLogin = (e) => {
     e.preventDefault();
+    const user = { email, password }; // fake user for demo
+    // redirect after login
+
+
 
     // Fetch stored user data
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    //const storedUser = JSON.parse(localStorage.getItem("user"));
 
     if (!storedUser) {
       setError("No user found. Please sign up first.");
@@ -137,7 +149,10 @@ const Login = ({ onLogin }) => {
     }
 
 
+    // if (storedUser.email === email && storedUser.password === password) 
     if (storedUser.email === email && storedUser.password === password) {
+      dispatch(login(storedUser)); // sync Redux with localStorage
+
       setLoading(true);
       toast.success("Login successful! Redirecting...");
 
