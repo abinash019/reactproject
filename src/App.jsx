@@ -17,6 +17,7 @@ import { store } from './redux/store';
 import { Button } from './components/ui/button';
 import RouteProtected from './routes/RouteProtected';
 import { logout } from './redux/authSlice';
+import DashboardLayout from './pages/DashboardLayout';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -60,11 +61,14 @@ function App() {
 
 
       <Routes>
-        <Route path="/" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+        <Route path="/" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboards" />} />
 
-        {/* Public login page */}
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />
+        {/* Public login page 
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />*/}
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboards" />} />
+
         <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />} />
+
 
 
         {/* Protected routes */}
@@ -114,12 +118,33 @@ function App() {
         {/* Default route */}
         <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
 
+
         <Route
           path="/admin"
           element={
             <AdminRoute>
               <AdminDashboard />
             </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/dashboards"
+          element={
+            <ProtectedRoute>
+
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboards"
+          element={
+            <ProtectedRoute>
+
+              <DashboardLayout />
+            </ProtectedRoute>
           }
         />
       </Routes>

@@ -161,8 +161,10 @@ const Login = ({ onLogin }) => {
         setLoading(false);
         setError("");
         if (onLogin) onLogin();
+        navigate("/dashboards");
 
-        navigate("/localprofile");
+
+        //navigate("/localprofile");
 
       }, 1000);
 

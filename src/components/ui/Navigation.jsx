@@ -37,7 +37,7 @@ export default function NavigationPage() {
             <NavigationMenuContent className="absolute mt-2 bg-gray-800 rounded-md shadow-lg p-4 w-48 z-10">
               <ul className="flex flex-col gap-2">
                 <NavigationMenuLink asChild>
-                  <Link to="/" className="hover:text-gray-200 transition">Dashboard</Link>
+                  <Link to="/dashboards" className="hover:text-gray-200 transition">Dashboard</Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link to="/about" className="hover:text-gray-200 transition">About Us</Link>
