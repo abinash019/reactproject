@@ -1,152 +1,69 @@
 import './App.css';
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { useAuth0 } from "@auth0/auth0-react";
+
 import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import LocalProfile from './pages/LocalProfile';
+import DashboardLayout from './pages/DashboardLayout';
+import AdminDashboard from './pages/AdminDashboard';
+
 import NavigationPage from './components/ui/Navigation';
 import ProtectedRoute from './routes/ProtectedRoute';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminRoute from './routes/AdminRoute';
-import Signup from './pages/auth/Signup';
-import LocalProfile from './pages/LocalProfile';
-import { useState } from 'react';
-import { useSelector, useDispatch, Provider } from "react-redux";
-import { decrement, increment, reset, setStep } from './redux/counterSlice';
-import { store } from './redux/store';
-import { Button } from './components/ui/button';
 import RouteProtected from './routes/RouteProtected';
+import AdminRoute from './routes/AdminRoute';
+
 import { logout } from './redux/authSlice';
-import DashboardLayout from './pages/DashboardLayout';
+import AddTransaction from './pages/AddTransaction';
+import TransactionList from './pages/TransactionList';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
-  const { isAuthenticated, isLoading } = useAuth0();
   const dispatch = useDispatch();
+  const { isAuthenticated: isAuth0Authenticated, isLoading } = useAuth0();
+  const { isLoggedIn } = useSelector((state) => state.auth); // Redux state
 
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("user")
-  );
+  const isUserLoggedIn = isAuth0Authenticated || isLoggedIn;
 
-  /*function Counter() {
-    const { count, step } = useSelector(state => state.counter);
-    const dispatch = useDispatch();
-    return (
-      <div style={{ textAlign: "center", marginTop: "50px" }}>
-        <h1>Counter: {count}</h1>
-        <h3>Step: {step}</h3>
-        <input
-          type="number"
-          value={step}
-          onChange={(e) => dispatch(setStep(Number(e.target.value)))}
-        />
+  if (isLoading) return <div>Loading...</div>;
 
 
-        <Button onClick={() => dispatch(decrement())} style={{ marginRight: "10px" }}>-</Button>
-        <Button onClick={() => dispatch(increment())}>+</Button>
-        <Button className='mx-4' onClick={() => dispatch(reset())}>Reset</Button>
-
-      </div>
-    );
-  }*/
-
-  if (isLoading) return <div>Loading...</div>; // Auth0 initialization wait
+  //thunk
+  //redux persist
 
   return (
     <>
-
       <NavigationPage />
 
-
-
-
-
       <Routes>
-        <Route path="/" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboards" />} />
+        {/* Public routes */}
+        <Route path="/" element={!isUserLoggedIn ? <Login /> : <Navigate to="/dashboards" />} />
+        <Route path="/login" element={!isUserLoggedIn ? <Login /> : <Navigate to="/dashboards" />} />
+        <Route path="/signup" element={!isUserLoggedIn ? <Signup /> : <Navigate to="/dashboards" />} />
+        <Route path="/addtransaction" element={<AddTransaction />} />
+        <Route path="/showtransaction" element={<TransactionList />} />
+        <Route path="/showstransaction" element={<DashboardPage />} />
 
-        {/* Public login page 
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/home" />} />*/}
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboards" />} />
-
-        <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/home" />} />
 
 
 
         {/* Protected routes */}
-        {/* Protected routes */}
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/localprofile"
-          element={
-            <RouteProtected>
-              <LocalProfile onLogout={() => dispatch(logout())} />
-            </RouteProtected>
-          }
-        />
+        <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/localprofile" element={
+          <RouteProtected>
+            <LocalProfile onLogout={() => dispatch(logout())} />
+          </RouteProtected>
+        } />
 
+        <Route path="/dashboards" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>} />
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
-        {/* <Route
-            path="/localprofile"
-            element={
-              isLoggedIn ? (
-                <LocalProfile onLogout={() => setIsLoggedIn(false)} />
-              ) : (
-                <Login onLogin={() => setIsLoggedIn(true)} />
-              )
-            }
-          /> */}
-
-
-
-        {/*
-          <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
-        */}
-        {/* Default route */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
-
-
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          }
-        />
-
-        <Route
-          path="/dashboards"
-          element={
-            <ProtectedRoute>
-
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/dashboards"
-          element={
-            <ProtectedRoute>
-
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        />
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to={isUserLoggedIn ? "/dashboards" : "/login"} />} />
       </Routes>
     </>
   );

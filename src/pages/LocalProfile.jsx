@@ -48,6 +48,11 @@ const LocalProfile = ({ onLogout }) => {
 
   };
   const handleCancel = () => { setUser(originalUser); setIsEditing(false); };
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
+
 
 
   return (
@@ -128,7 +133,7 @@ const LocalProfile = ({ onLogout }) => {
           <p><strong>Bio:</strong> {user.bio}</p>
 
           <div className="mt-6 flex justify-between">
-            <Button className="bg-red-500 hover:bg-red-800" onClick={onLogout}>
+            <Button className="bg-red-500 hover:bg-red-800" onClick={handleLogout}>
               Logout
             </Button>
             <Button onClick={() => { setIsEditing(true) }}>
