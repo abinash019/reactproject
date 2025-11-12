@@ -21,7 +21,8 @@ const LogoutButton = () => {
   };
 
   return (
-    <button className="cursor-pointer" onClick={handleLogout}>
+    <button className="cursor-pointer font-bold 
+    " onClick={handleLogout}>
       Log Out
     </button>
   );

@@ -106,7 +106,7 @@ const Login = () => {
 export default Login
 */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
@@ -116,24 +116,34 @@ import { FaFacebook, FaUserPlus } from 'react-icons/fa';
 import { SiAuth0 } from 'react-icons/si';
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/authSlice';
+import { loginUser } from '../../redux/authThunk';
 
 const Login = ({ onLogin }) => {
   const { loginWithRedirect } = useAuth0();
   const dispatch = useDispatch();
   //const loading = useSelector((state) => state.auth.loading);
-
+  const { user, loading, error, isLoggedIn } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const storedUser = useSelector(state => state.auth.user);
 
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/dashboard"); // Redirect after login
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleLogin = (e) => {
+    e.preventDefault();
+    dispatch(loginUser({ email, password }));
+  };
+
+
+
+  /*const handleLogin = (e) => {
     e.preventDefault();
     const user = { email, password }; // fake user for demo
     // redirect after login
@@ -171,7 +181,7 @@ const Login = ({ onLogin }) => {
     } else {
       setError("Email or Password is incorrect!");
     }
-  };
+  };*/
 
 
 
@@ -181,7 +191,7 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">
+    <div className="max-w-md mx-auto mt-10 bg-white shadow-lg border-solid p-6 rounded-lg">
       <Toaster position="top-center" reverseOrder={false} />
 
       <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>

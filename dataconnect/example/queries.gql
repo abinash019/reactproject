@@ -1,0 +1,42 @@
+mutation CreateTransaction($categoryId: UUID!, $amount: Float!, $date: Date!, $description: String, $type: String!) @auth(level: USER) {
+  transaction_insert(data: {
+    categoryId: $categoryId,
+    userId_expr: "auth.uid",
+    amount: $amount,
+    date: $date,
+    description: $description,
+    type: $type
+  })
+}
+
+query GetTransactionsForUser @auth(level: USER) {
+  transactions(where: {userId: {eq_expr: "auth.uid"}}) {
+    id
+    amount
+    date
+    description
+    type
+    category {
+      id
+      name
+      type
+    }
+  }
+}
+
+mutation CreateCategory($name: String!, $type: String!) @auth(level: USER) {
+  category_insert(data: {
+    userId_expr: "auth.uid",
+    name: $name,
+    type: $type,
+    createdAt_expr: "request.time"
+  })
+}
+
+query GetCategoriesForUser @auth(level: USER) {
+  categories(where: {userId: {eq_expr: "auth.uid"}}) {
+    id
+    name
+    type
+  }
+}

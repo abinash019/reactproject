@@ -13,12 +13,21 @@ import {
 } from "@radix-ui/react-navigation-menu";
 import { CircleCheck, CircleHelp, Home, BookOpen } from "lucide-react";
 import LogoutButton from "./LogoutButton";
+import { useSelector } from "react-redux";
 
 export default function NavigationPage() {
   const { user, isAuthenticated } = useAuth0();
 
+  const { isAuthenticated: isAuth0Authenticated, isLoading } = useAuth0();
+  const { isLoggedIn } = useSelector((state) => state.auth); // Redux state
+
+  const isUserLoggedIn = isAuth0Authenticated || isLoggedIn;
+
+  if (isLoading) return <div>Loading...</div>;
+
+
   return (
-    <NavigationMenu className="relative bg-gray-900 text-white shadow-md">
+    <NavigationMenu className="relative bg-green-900 text-white shadow-md">
       <NavigationMenuList className="flex items-center justify-between p-4 max-w-6xl mx-auto">
 
         {/* Logo */}
@@ -82,17 +91,19 @@ export default function NavigationPage() {
             </NavigationMenuLink>
           </NavigationMenuItem>
 
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link
-                to="/localprofile"
-                className="flex items-center gap-1 hover:text-gray-300 transition"
-              >
-                Profile
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+          {isAuthenticated || isLoggedIn && (
 
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link
+                  to="/localprofile"
+                  className="flex items-center gap-1 hover:text-gray-300 transition"
+                >
+                  Profile
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          )}
           {/* User Profile */}
           {isAuthenticated && (
             <div className="flex items-center gap-3 ml-6">
@@ -109,11 +120,13 @@ export default function NavigationPage() {
           )}
 
           {/* Logout */}
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <LogoutButton />
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+
+          {isAuthenticated || isLoggedIn && (
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <LogoutButton />
+              </NavigationMenuLink>
+            </NavigationMenuItem>)}
 
         </div>
       </NavigationMenuList>

@@ -21,7 +21,7 @@ const Profile = () => {
   if (!isAuthenticated) return <div>Please login first</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center border-solid h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-md w-96 text-center">
         <h1>Home page</h1>
         <img

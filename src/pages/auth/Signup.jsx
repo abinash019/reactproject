@@ -1,18 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Button } from "../../components/ui/button";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { login, signup } from "../../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { signupUser } from "../../redux/authThunk";
 
 
 
 const Signup = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+
+  const { user, loading, error, isLoggedIn, rehydrated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    /*if (!rehydrated) return; // ⚡ Only run after rehydration
+    console.log("Auth state after rehydration:", { loading, user, isLoggedIn, error });*/
+
+    if (isLoggedIn) {
+      navigate("/dashboard");
+    }
+  }, [rehydrated, isLoggedIn, navigate]);
 
 
   const handleRedirect = () => {
@@ -37,7 +47,7 @@ const Signup = () => {
   };
 
   // handle submit
-  const handleSubmit = (e) => {
+  /*const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     toast.success("Signup successful! Redirecting to login...");
@@ -52,7 +62,27 @@ const Signup = () => {
     }, 1000);
 
 
+  };*/
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(signupUser({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      bio: formData.bio,
+      password: formData.password
+    })).unwrap() // ✅ unwrap() returns promise for success/failure
+      .then(() => {
+        toast.success("Signup successful! Redirecting to login...");
+        navigate("/login"); // redirect after success
+      })
+      .catch((err) => {
+        toast.error(err || "Signup failed");
+      });
   };
+
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">

@@ -1,0 +1,56 @@
+mutation CreateSeedData @auth(level: PUBLIC, insecureReason: "This operation is used to populate the database with seed data.") @transaction {
+  user_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      createdAt: "2024-04-23T12:00:00Z",
+      displayName: "Demo User 1",
+      email: "demo1@example.com",
+      hashedPassword: "password123"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      createdAt: "2024-04-23T13:00:00Z",
+      displayName: "Demo User 2",
+      email: "demo2@example.com",
+      hashedPassword: "password456"
+    }
+  ])
+  category_insertMany(data: [
+    {
+      id: "650e8400-e29b-41d4-a716-446655440000",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      createdAt: "2024-04-23T14:00:00Z",
+      name: "Food",
+      type: "Expense"
+    },
+    {
+      id: "650e8400-e29b-41d4-a716-446655440001",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      createdAt: "2024-04-23T15:00:00Z",
+      name: "Salary",
+      type: "Income"
+    }
+  ])
+  transaction_insertMany(data: [
+    {
+      id: "750e8400-e29b-41d4-a716-446655440000",
+      categoryId: "650e8400-e29b-41d4-a716-446655440000",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      amount: 50.00,
+      createdAt: "2024-04-23T16:00:00Z",
+      date: "2024-04-23",
+      description: "Lunch with colleagues",
+      type: "Expense"
+    },
+    {
+      id: "750e8400-e29b-41d4-a716-446655440001",
+      categoryId: "650e8400-e29b-41d4-a716-446655440001",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      amount: 5000.00,
+      createdAt: "2024-04-23T17:00:00Z",
+      date: "2024-04-23",
+      description: "Monthly salary",
+      type: "Income"
+    }
+  ])
+}

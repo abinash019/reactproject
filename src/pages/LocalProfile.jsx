@@ -6,14 +6,15 @@ import { logout, updateUser } from "../redux/authSlice";
 
 
 const LocalProfile = ({ onLogout }) => {
+  const dispatch = useDispatch();
   const storedUser = useSelector((state) => state.auth.user);
+
 
   // JSON.parse(localStorage.getItem("user"));
   const [user, setUser] = useState(storedUser || { firstName: '', lastName: '', email: '', phone: '', bio: '' });
 
   const [originalUser, setOriginalUser] = useState(storedUser);
 
-  const dispatch = useDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
