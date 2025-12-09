@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteTransaction } from '../redux/transactionsSlice';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import LineChartComponent from '../components/charts/LineChart';
@@ -10,27 +10,49 @@ import { toast } from 'react-toastify';
 import { aggregateByCategory, aggregateIncomeExpenseByMonth } from '../utils/aggregation';
 import CategoryPieChart from '../components/graph/CategoryPieChart';
 import DynamicLineChart from '../components/graph/DynamicLineChart';
+import Modal from '../components/ui/modal';
+import AddTransactionModal from './AddTransaction';
+import { listenUserTransactions } from '../firebase/transactionService';
 
 // Helper function to calculate total income/expense
 const calculateTotal = (transactions, type) =>
   transactions.filter(transaction => transaction.type === type)
     .reduce((total, transaction) => total + transaction.amount, 0);
 
-const DashboardPage = ({ userId }) => {
+const DashboardPage = () => {
+
   const dispatch = useDispatch();
   const [transactions, setTransactions] = useState([]);
   const [dateRange, setDateRange] = useState('month');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const user = useSelector(state => state.auth.user);
+  const userId = user?.uid;
+
+  console.log("🔥 Dashboard userId:", userId);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const unsubscribe = listenUserTransactions(userId, (data) => {
+      console.log("🔥 Live Firebase Data:", data);
+      setTransactions(data);
+    });
+
+    return () => unsubscribe();
+  }, [userId]);
+
+
 
   // Fetch transactions from localStorage (or Redux if preferred)
-  useEffect(() => {
+  /*useEffect(() => {
     const storedTransactions = localStorage.getItem('transactions');
     if (storedTransactions) {
       const parsedTransactions = JSON.parse(storedTransactions);
       setTransactions(parsedTransactions.filter(t => t.userId === userId));
     }
-  }, [userId]);
+  }, [userId]);*/
 
   // Filter transactions based on date range and other filters
   const filterTransactions = (transactions, dateRange, categoryFilter, typeFilter) => {
@@ -112,6 +134,21 @@ const DashboardPage = ({ userId }) => {
           </CardContent>
         </Card>
       </div>
+      <div className="flex justify-end">
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md"
+        >
+          + Add Transaction
+        </Button>
+      </div>
+
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Transaction">
+        <AddTransactionModal userId={userId} closeModal={() => setIsModalOpen(false)} />
+      </Modal>
+
+
+
 
       {/* Filter Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -151,6 +188,7 @@ const DashboardPage = ({ userId }) => {
           </select>
         </div>
       </div>
+
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">

@@ -7,26 +7,22 @@ import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { signupUser } from "../../redux/authThunk";
 
-
-
 const Signup = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { user, loading, error, isLoggedIn, rehydrated } = useSelector((state) => state.auth);
+  const { user, loading, error, isLoggedIn } = useSelector((state) => state.auth);
 
+  // 🔥 FIX: Redirect if user is already logged in
   useEffect(() => {
-    /*if (!rehydrated) return; // ⚡ Only run after rehydration
-    console.log("Auth state after rehydration:", { loading, user, isLoggedIn, error });*/
-
-    if (isLoggedIn) {
-      navigate("/dashboard");
+    if (isLoggedIn || user) {
+      console.log("User is already logged in, redirecting to dashboard");
+      navigate("/dashboards");
     }
-  }, [rehydrated, isLoggedIn, navigate]);
-
+  }, [isLoggedIn, user, navigate]);
 
   const handleRedirect = () => {
-    navigate('/login'); // This redirects to the signup page
+    navigate('/login');
   };
 
   const [formData, setFormData] = useState({
@@ -38,7 +34,6 @@ const Signup = () => {
     password: "",
   });
 
-  // handle change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -46,55 +41,59 @@ const Signup = () => {
     });
   };
 
-  // handle submit
-  /*const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    toast.success("Signup successful! Redirecting to login...");
 
+    try {
+      await dispatch(signupUser({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        bio: formData.bio,
+        password: formData.password
+      })).unwrap();
 
-    setTimeout(() => {
-      dispatch(signup(formData))
-      //localStorage.setItem("user", JSON.stringify(formData));
-      setLoading(false);
-      navigate("/login");
+      toast.success("Account created successfully! Redirecting to login...");
 
-    }, 1000);
-
-
-  };*/
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(signupUser({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      bio: formData.bio,
-      password: formData.password
-    })).unwrap() // ✅ unwrap() returns promise for success/failure
-      .then(() => {
-        toast.success("Signup successful! Redirecting to login...");
-        navigate("/login"); // redirect after success
-      })
-      .catch((err) => {
-        toast.error(err || "Signup failed");
+      // Clear form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        bio: "",
+        password: "",
       });
-  };
 
+      // Redirect to login
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
+    } catch (err) {
+      toast.error(typeof err === 'string' ? err : "Signup failed. Please try again.");
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white shadow-lg p-6 rounded-lg">
       <Toaster position="top-center" reverseOrder={false} />
 
       <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-      <form onSubmit={handleSubmit} className=" space-y-4">
 
+      {/* 🔥 SHOW ERROR IF ANY */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {typeof error === 'string' ? error : JSON.stringify(error)}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form fields - keep as before */}
         <div className="flex space-x-4">
-
           <div className="flex-1">
-            <Label htmlFor="firstName">First Name</Label>
+            <Label htmlFor="firstName">First Name *</Label>
             <Input
               type="text"
               id="firstName"
@@ -106,7 +105,7 @@ const Signup = () => {
           </div>
 
           <div className="flex-1">
-            <Label htmlFor="lastName">Last Name</Label>
+            <Label htmlFor="lastName">Last Name *</Label>
             <Input
               type="text"
               id="lastName"
@@ -119,7 +118,7 @@ const Signup = () => {
         </div>
 
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Email *</Label>
           <Input
             type="email"
             id="email"
@@ -138,7 +137,6 @@ const Signup = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -153,29 +151,38 @@ const Signup = () => {
           />
         </div>
 
-
         <div>
-          <Label htmlFor="password">password</Label>
+          <Label htmlFor="password">Password *</Label>
           <Input
             type="password"
             id="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
+            required
+            minLength="6"
           />
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Signing up..." : "Sign Up"}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={loading}
+        >
+          {loading ? "Creating Account..." : "Sign Up"}
         </Button>
 
-        <Button
-          variant="link"  // Makes it text style (no button appearance)
-          className=" mx-5 bg-white  hover:bg-gray-100 hover:underline hover:decoration-blue-500 py-2 px-4"
-          onClick={handleRedirect}
-        >
-          <span className='text-blue-500'> Go to Login</span>
-        </Button>
+        <div className="text-center mt-4">
+          <span className="text-gray-600">Already have an account? </span>
+          <Button
+            variant="link"
+            className="ml-2 p-0 h-auto text-blue-500 hover:text-blue-700"
+            onClick={handleRedirect}
+            type="button"
+          >
+            Login here
+          </Button>
+        </div>
       </form>
     </div>
   );

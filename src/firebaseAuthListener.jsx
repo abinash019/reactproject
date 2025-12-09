@@ -1,21 +1,19 @@
-import { useEffect } from "react";
+// src/firebaseAuthListener.js
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "./redux/authThunk";
-import { auth } from "./firebase";
 
 const FirebaseAuthListener = () => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
-      if (firebaseUser) {
-        dispatch(fetchUserProfile());
-      }
-    });
-    return () => unsubscribe();
+    dispatch(fetchUserProfile())
+      .finally(() => setLoading(false));
   }, [dispatch]);
 
-  return null; // no loading UI here
+  if (loading) return <div>Loading user...</div>;
+  return null;
 };
 
 export default FirebaseAuthListener;

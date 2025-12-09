@@ -24,11 +24,20 @@ import RouteProtected from './routes/RouteProtected';
 import AdminRoute from './routes/AdminRoute';
 import FirebaseAuthListener from './firebaseAuthListener';
 import { logout } from './redux/authSlice';
+import { useEffect, useState } from 'react';
 
 function App() {
   const dispatch = useDispatch();
   const { rehydrated, user } = useSelector(state => state.auth); // Redux state
   const { isAuthenticated: isAuth0Authenticated, isLoading } = useAuth0();
+  const [appReady, setAppReady] = useState(false);
+
+  useEffect(() => {
+    if (!rehydrated || isLoading) return;
+    const t = setTimeout(() => setAppReady(true), 500);
+    return () => clearTimeout(t);
+  }, [rehydrated, isLoading]);
+
 
   // Wait until Redux Persist rehydrated & Firebase user loaded
   const userLoaded = user !== undefined;
@@ -91,7 +100,7 @@ function App() {
           path="/dashboards"
           element={
             <ProtectedRoute>
-              <DashboardLayout />
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
